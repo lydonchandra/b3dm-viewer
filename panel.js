@@ -3,6 +3,9 @@ window.THREE = require("three")
 var GLTFLoader = require("three/examples/js/loaders/GLTFLoader.js")
 window.THREE.B3DMLoader = require("three/examples/js/loaders/B3DMLoader.js")
 require("three/examples/js/loaders/DRACOLoader.js")
+require('three/examples/js/controls/OrbitControls');
+require('three/examples/js/controls/TrackballControls');
+
 
 // var canvas = document.getElementById( 'webgl-canvas' );
 // var context = canvas.getContext( 'webgl2' );
@@ -22,6 +25,18 @@ document.body.appendChild( renderer.domElement );
 var defaultCamera = new THREE.PerspectiveCamera( 45, width / height, 1, 500 );
 defaultCamera.position.set( 0, 0, 100 );
 defaultCamera.lookAt( 0, 0, 0 );
+
+// var controls = new THREE.OrbitControls( defaultCamera, renderer.domElement );
+// controls.autoRotate = false;
+// controls.autoRotateSpeed = -10;
+// controls.screenSpacePanning = true;
+// controls.enabled = true;
+
+var trackballControls = new THREE.TrackballControls(defaultCamera);
+trackballControls.rotateSpeed = 1.0;
+trackballControls.zoomSpeed = 1.0;
+trackballControls.panSpeed = 1.0;
+
 
 var scene = new THREE.Scene();
 
@@ -57,6 +72,7 @@ function viewB3dm (url) {
         setContent(scene, clips);
     })
 }
+
 function setContent ( object, clips ) {
 
     // this.clear();
@@ -65,7 +81,7 @@ function setContent ( object, clips ) {
     const size = box.getSize(new THREE.Vector3()).length();
     const center = box.getCenter(new THREE.Vector3());
 
-    // this.controls.reset();
+    // controls.reset();
 
     // object.position.x += (object.position.x - center.x);
     // object.position.y += (object.position.y - center.y);
@@ -98,7 +114,7 @@ function setContent ( object, clips ) {
     // }
 
     // this.setCamera(DEFAULT_CAMERA);
-
+    // controls.saveState();
     // this.controls.saveState();
 
     scene.add(object);
@@ -108,7 +124,7 @@ function setContent ( object, clips ) {
     hemiLight.name = 'hemi_light';
     scene.add(hemiLight);
 
-    requestAnimationFrame( renderWebgl );
+    renderWebgl()
     // this.content = object;
     //
     // this.state.addLights = true;
@@ -125,8 +141,16 @@ function setContent ( object, clips ) {
     // this.updateTextureEncoding();
 }
 
+var clock = new THREE.Clock();
+
 function renderWebgl () {
+
+    var delta = clock.getDelta();
+    trackballControls.update(delta);
+    // controls.update();
+    requestAnimationFrame(renderWebgl)
     renderer.render( scene, defaultCamera );
+
 }
 
 
