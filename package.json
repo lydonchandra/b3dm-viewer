@@ -1,0 +1,14 @@
+{
+  "name": "b3dm-viewer",
+  "version": "1.0.0",
+  "description": "",
+  "main": "background.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "three": "git+https://github.com/lydonchandra/three.js.git#feature/B3DMLoader"
+  }
+}
