@@ -2,16 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Panel</title>
+    <title>B3DM Viewer</title>
+    <style>
+        .canvas {
+            float: right;
+            position: fixed;
+            top: 0;
+            right: 0;
+        }
+
+        .analysis-output {
+            width: 50%;
+        }
+
+    </style>
 </head>
 <body>
     B3DM Viewer
-
+    <button id="clearUrls">Clear URLs</button>
+    <button id="clearCanvas">Clear Canvas</button>
     <div style="display: flex; flex-direction: row;">
-        <canvas id="canvas-webgl" style="float: right; position: fixed; top: 0; right: 0;"></canvas>
 
-        <div class="analysis-output" style="width: 50%;"></div>
+        <canvas id="canvas-webgl" class="canvas"></canvas>
+        <div class="analysis-output"></div>
+
     </div>
+
     <script src="bundle.js"></script>
 </body>
 </html>

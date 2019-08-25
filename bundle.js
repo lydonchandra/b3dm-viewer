@@ -55235,7 +55235,7 @@ require('three/examples/js/controls/TrackballControls');
 
 canvas = document.getElementById("canvas-webgl")
 
-var renderer = new THREE.WebGLRenderer( { canvas: canvas } );
+renderer = new THREE.WebGLRenderer( { canvas: canvas } );
 const ratio = 0.5
 const width = ratio * window.innerWidth
 const height = ratio * window.innerHeight
@@ -55244,7 +55244,7 @@ renderer.setSize( width, height );
 
 document.body.appendChild( renderer.domElement );
 
-var defaultCamera = new THREE.PerspectiveCamera( 45, width / height, 1, 500 );
+defaultCamera = new THREE.PerspectiveCamera( 45, width / height, 1, 500 );
 defaultCamera.position.set( 0, 0, 100 );
 defaultCamera.lookAt( 0, 0, 0 );
 
@@ -55260,7 +55260,7 @@ trackballControls.zoomSpeed = 1.0;
 trackballControls.panSpeed = 1.0;
 
 
-var scene = new THREE.Scene();
+scene = new THREE.Scene();
 
 // var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 // var geometry = new THREE.Geometry();
@@ -55347,8 +55347,6 @@ function setContent ( object, clips ) {
     scene.add(hemiLight);
 
     renderWebgl()
-    // this.content = object;
-    //
     // this.state.addLights = true;
     // this.content.traverse((node) => {
     //     if (node.isLight) {
@@ -55392,6 +55390,34 @@ function clickHandler(evt, url) {
         const b3dmUrl = evt.target.getAttribute("data-b3dm-url")
         viewB3dm( b3dmUrl )
     }
+}
+
+const clearUrlsBtn = document.getElementById("clearUrls")
+clearUrlsBtn.addEventListener("click", clearUrls)
+
+function clearUrls() {
+
+    output.innerHTML = ""
+    b3dms = []
+
+}
+
+const clearCanvasBtn = document.getElementById("clearCanvas")
+clearCanvasBtn.addEventListener("click", clearCanvas)
+
+function clearCanvas() {
+    for ( var childIdx = 0; childIdx < scene.children.length; childIdx++ ) {
+        var sceneChild = scene.children[ childIdx ]
+
+        if ( sceneChild instanceof THREE.Scene ) {
+            for ( var grandChildIdx = sceneChild.children.length - 1; grandChildIdx >= 0; grandChildIdx-- ) {
+                var grandChild = sceneChild.children [ grandChildIdx ]
+                sceneChild.remove( grandChild )
+            }
+        }
+        // scene.remove(scene.children[0])
+    }
+
 }
 
 // Simple render function.
