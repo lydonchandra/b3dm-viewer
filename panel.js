@@ -5,12 +5,9 @@ window.THREE.B3DMLoader = require("three/examples/js/loaders/B3DMLoader.js")
 require("three/examples/js/loaders/DRACOLoader.js")
 require('three/examples/js/controls/OrbitControls');
 require('three/examples/js/controls/TrackballControls');
+require('three/examples/js/controls/FirstPersonControls');
 
-
-// var canvas = document.getElementById( 'webgl-canvas' );
-// var context = canvas.getContext( 'webgl2' );
-// var renderer = new THREE.WebGLRenderer( { canvas: canvas, context: context } );
-
+//
 canvas = document.getElementById("canvas-webgl")
 
 renderer = new THREE.WebGLRenderer( { canvas: canvas } );
@@ -32,13 +29,22 @@ defaultCamera.lookAt( 0, 0, 0 );
 // controls.screenSpacePanning = true;
 // controls.enabled = true;
 
-var trackballControls = new THREE.TrackballControls(defaultCamera);
+var trackballControls = new THREE.TrackballControls( defaultCamera, renderer.domElement );
 trackballControls.rotateSpeed = 1.0;
 trackballControls.zoomSpeed = 1.0;
 trackballControls.panSpeed = 1.0;
 
+// var fpControls = new THREE.FirstPersonControls(defaultCamera, renderer.domElement);
+// fpControls.lookSpeed = 0.4;
+// fpControls.movementSpeed = 20;
+// fpControls.lookVertical = true;
+// fpControls.constrainVertical = true;
+// fpControls.verticalMin = 1.0;
+// fpControls.verticalMax = 2.0;
 
 scene = new THREE.Scene();
+
+// scene.overrideMaterial = new THREE.MeshLambertMaterial({color: 0xffffff});
 
 // var material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
 // var geometry = new THREE.Geometry();
@@ -53,8 +59,6 @@ gltfLoader.setCrossOrigin('anonymous');
 gltfLoader.setDRACOLoader( new THREE.DRACOLoader() );
 const b3dmLoader = new THREE.B3DMLoader.B3DMLoader(manager, gltfLoader);
 
-// let testUrl = "http://localhost:8080/Build/Apps/CesiumViewer/3dmodels/reindeer/january-2019-no-cesium-patch/textured/b/0/0.b3dm"
-//
 // b3dmLoader.load(testUrl, (gltf) => {
 //
 //     const scene = gltf.scene || gltf.scenes[0];
@@ -120,6 +124,33 @@ function setContent ( object, clips ) {
     scene.add(object);
     //renderer.render( scene, defaultCamera );
 
+    var spotLight = new THREE.SpotLight("#ffffff");
+    spotLight.position.set(-40, 60, -10);
+    spotLight.castShadow = true;
+    spotLight.shadow.camera.near = 1;
+    spotLight.shadow.camera.far = 100;
+    // spotLight.target = plane;
+    spotLight.distance = 0;
+    spotLight.angle = 0.4;
+    spotLight.shadow.camera.fov = 120;
+    //
+    // var directionalLight = new THREE.DirectionalLight("#ffffff")
+    // directionalLight.castShadow = true;
+    // directionalLight.shadow.camera.near = 2;
+    // directionalLight.shadow.camera.far = 800;
+    // directionalLight.shadow.camera.left = -30;
+    // directionalLight.shadow.camera.right = 30;
+    // directionalLight.shadow.camera.top = 30;
+    // directionalLight.shadow.camera.bottom = -30;
+    //
+    //
+    scene.add(spotLight);
+    // scene.add(directionalLight)
+
+
+    // var ambientLight = new THREE.AmbientLight("#606008");
+    // scene.add(ambientLight);
+
     const hemiLight = new THREE.HemisphereLight();
     hemiLight.name = 'hemi_light';
     scene.add(hemiLight);
@@ -145,6 +176,8 @@ function renderWebgl () {
 
     var delta = clock.getDelta();
     trackballControls.update(delta);
+    // fpControls.update(delta);
+
     // controls.update();
     requestAnimationFrame(renderWebgl)
     renderer.render( scene, defaultCamera );
