@@ -14,3 +14,16 @@ chrome.runtime.onInstalled.addListener(function() {
     });
 })
 
+
+// var callback = function(details) {
+//     console.log('--------------------------- onHeadersReceived ', details)
+// };
+// var filter = {
+
+// };
+// var opt_extraInfoSpec = [ 'extraHeaders' ];
+
+// chrome.webRequest.onHeadersReceived.addListener(
+//     callback, filter, opt_extraInfoSpec);
+
+  

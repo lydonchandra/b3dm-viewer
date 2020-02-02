@@ -5187,6 +5187,8 @@
 	var _m1$1, _q1, _v1$1;
 	var _xAxis, _yAxis, _zAxis;
 	var _target, _position, _scale, _quaternion$2;
+	var _addedEvent = { type: 'added' };
+	var _removedEvent = { type: 'removed' };
 
 	function Object3D() {
 
@@ -5521,7 +5523,7 @@
 				object.parent = this;
 				this.children.push( object );
 
-				object.dispatchEvent( { type: 'added' } );
+				object.dispatchEvent( _addedEvent );
 
 			} else {
 
@@ -5554,7 +5556,7 @@
 				object.parent = null;
 				this.children.splice( index, 1 );
 
-				object.dispatchEvent( { type: 'removed' } );
+				object.dispatchEvent( _removedEvent );
 
 			}
 
@@ -49369,7 +49371,7 @@
 
 	Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+}));
 
 },{}],2:[function(require,module,exports){
 /**
@@ -51530,99 +51532,86 @@ THREE.TrackballControls.prototype = Object.create( THREE.EventDispatcher.prototy
 THREE.TrackballControls.prototype.constructor = THREE.TrackballControls;
 
 },{}],5:[function(require,module,exports){
-( function ( global, factory ) {
+THREE.B3DMLoader = ( function () {
 
-	typeof exports === 'object' && typeof module !== 'undefined' ? factory( exports, require( 'three' ) ) :
-		typeof define === 'function' && define.amd ? define( [ 'exports', 'three' ], factory ) :
-			( global = global || self, factory( global.THREE = global.THREE || {}, global.THREE ) );
+	function B3DMLoader( manager, gltfLoader ) {
 
-}( this, function ( exports, THREE ) {
+		this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
 
-	'use strict';
+		this.gltfLoader = gltfLoader;
 
-	var B3DMLoader = ( function () {
+	}
 
-		function B3DMLoader( manager, gltfLoader ) {
+	B3DMLoader.prototype = {
 
-			this.manager = ( manager !== undefined ) ? manager : THREE.DefaultLoadingManager;
+		constructor: B3DMLoader,
 
-			this.gltfLoader = gltfLoader;
+		load: function ( url, onLoad, onProgress, onError ) {
 
-		}
+			this.gltfLoader.load.call( this, url, onLoad, onProgress, onError );
 
-		B3DMLoader.prototype = {
+		},
 
-			constructor: B3DMLoader,
+		parse: function ( data, path, onLoad, onError ) {
 
-			load: function ( url, onLoad, onProgress, onError ) {
+			var magic = THREE.LoaderUtils.decodeText( new Uint8Array( data, 0, 4 ) );
 
-				this.gltfLoader.load.call( this, url, onLoad, onProgress, onError );
+			if ( magic === "b3dm" ) {
 
-			},
+				try {
 
-			parse: function ( data, path, onLoad, onError ) {
+					var b3dm = new B3DMExtension( data );
+					this.gltfLoader.parse( b3dm.bodyGlb, path, onLoad, onError );
 
-				var magic = THREE.LoaderUtils.decodeText( new Uint8Array( data, 0, 4 ) );
+				} catch ( error ) {
 
-				if ( magic === "b3dm" ) {
-
-					try {
-
-						var b3dm = new B3DMExtension( data );
-						this.gltfLoader.parse( b3dm.bodyGlb, path, onLoad, onError );
-
-					} catch ( error ) {
-
-						if ( onError ) onError( error );
-						return;
-
-					}
+					if ( onError ) onError( error );
+					return;
 
 				}
 
 			}
 
-		};
-
-		var B3DM_HEADER_LENGTH = 28;
-
-		function B3DMExtension( data ) {
-
-			this.name = "b3dm";
-			this.content = null;
-			this.body = null;
-			var headerView = new DataView( data, 0, B3DM_HEADER_LENGTH );
-
-			this.header = {
-
-				magic: THREE.LoaderUtils.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
-				version: headerView.getUint32( 4, true ),
-				length: headerView.getUint32( 8, true ),
-				featureTableJSONByteLength: headerView.getUint32( 12, true ),
-				featureTableBinaryByteLength: headerView.getUint32( 16, true ),
-				batchTableJSONByteLength: headerView.getUint32( 20, true ),
-				batchTableBinaryByteLength: headerView.getUint32( 24, true )
-
-			};
-
-			this.body = data.slice( B3DM_HEADER_LENGTH, this.header.length );
-
-			var glbStartOffset = B3DM_HEADER_LENGTH + this.header.featureTableJSONByteLength + this.header.featureTableBinaryByteLength
-				+ this.header.batchTableJSONByteLength + this.header.batchTableBinaryByteLength;
-
-			this.bodyGlb = data.slice( glbStartOffset, this.header.length );
-
 		}
 
-		return B3DMLoader;
+	};
 
-	} )();
+	var B3DM_HEADER_LENGTH = 28;
 
-	exports.B3DMLoader = B3DMLoader;
+	function B3DMExtension( data ) {
 
-} ) );
+		this.name = "b3dm";
+		this.content = null;
+		this.body = null;
+		var headerView = new DataView( data, 0, B3DM_HEADER_LENGTH );
 
-},{"three":1}],6:[function(require,module,exports){
+		this.header = {
+
+			magic: THREE.LoaderUtils.decodeText( new Uint8Array( data.slice( 0, 4 ) ) ),
+			version: headerView.getUint32( 4, true ),
+			length: headerView.getUint32( 8, true ),
+			featureTableJSONByteLength: headerView.getUint32( 12, true ),
+			featureTableBinaryByteLength: headerView.getUint32( 16, true ),
+			batchTableJSONByteLength: headerView.getUint32( 20, true ),
+			batchTableBinaryByteLength: headerView.getUint32( 24, true )
+
+		};
+
+		this.body = data.slice( B3DM_HEADER_LENGTH, this.header.length );
+
+		var glbStartOffset = B3DM_HEADER_LENGTH + this.header.featureTableJSONByteLength + this.header.featureTableBinaryByteLength
+			+ this.header.batchTableJSONByteLength + this.header.batchTableBinaryByteLength;
+
+		this.bodyGlb = data.slice( glbStartOffset, this.header.length );
+
+	}
+
+	return B3DMLoader;
+
+} )();
+
+
+},{}],6:[function(require,module,exports){
 /** Copyright 2016 The Draco Authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -52482,6 +52471,86 @@ THREE.GLTFLoader = ( function () {
 
 		},
 
+		isShouldUseTextureHack( gltfParserJson ) {
+
+			let isShouldUseTextureHack = false;
+
+			if ( gltfParserJson.materials && gltfParserJson.materials.length > 0 ) {
+
+				for ( let material of gltfParserJson.materials ) {
+
+					for ( let [ key, value ] of Object.entries( material ) ) {
+
+						if ( key === 'extensions' ) {
+
+							for ( let [ key2, value2 ] of Object.entries( value ) ) {
+
+								if ( key2 === 'KHR_techniques_webgl' ) {
+
+									isShouldUseTextureHack = true;
+									return isShouldUseTextureHack;
+
+								}
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+			return isShouldUseTextureHack;
+
+		},
+
+		useTextureHack( gltfParserJson ) {
+
+			let hackMaterials = [];
+			for ( let idx = 0; idx < gltfParserJson.materials.length; idx ++ ) {
+
+				let material = gltfParserJson.materials[ idx ];
+
+				for ( let [ key, value ] of Object.entries( material ) ) {
+
+					if ( key === 'extensions' ) {
+
+						for ( let [ key2, value2 ] of Object.entries( value ) ) {
+
+							if ( key2 === 'KHR_techniques_webgl' ) {
+
+								if ( value[ key2 ].values &&
+									value[ key2 ].values.u_tex &&
+									value[ key2 ].values.u_tex.index !== null ) {
+
+
+									hackMaterials.push( {
+										"pbrMetallicRoughness": {
+											"baseColorTexture": {
+												"index": value[ key2 ].values.u_tex.index
+											}
+										},
+										"name": "hackMaterial_" + value[ key2 ].values.u_tex.index
+									} );
+
+								}
+
+							}
+
+						}
+
+					}
+
+				}
+
+			}
+
+			gltfParserJson.materials = hackMaterials;
+
+		},
+
 		parse: function ( data, path, onLoad, onError ) {
 
 			var content;
@@ -52571,6 +52640,12 @@ THREE.GLTFLoader = ( function () {
 					}
 
 				}
+
+			}
+
+			if ( this.isShouldUseTextureHack( json ) ) {
+
+				this.useTextureHack( json );
 
 			}
 
@@ -53537,7 +53612,7 @@ THREE.GLTFLoader = ( function () {
 
 		// Invalid URL
 		if ( typeof url !== 'string' || url === '' ) return '';
-		
+
 		// Host Relative URL
 		if ( /^https?:\/\//i.test( path ) && /^\//.test( url ) ) {
 
@@ -55567,11 +55642,13 @@ THREE.GLTFLoader = ( function () {
 window.THREE = require("three")
 
 var GLTFLoader = require("three/examples/js/loaders/GLTFLoader.js")
-window.THREE.B3DMLoader = require("three/examples/js/loaders/B3DMLoader.js")
+require("three/examples/js/loaders/B3DMLoader.js")
 require("three/examples/js/loaders/DRACOLoader.js")
 require('three/examples/js/controls/OrbitControls');
 require('three/examples/js/controls/TrackballControls');
 require('three/examples/js/controls/FirstPersonControls');
+
+
 
 //
 canvas = document.getElementById("canvas-webgl")
@@ -55623,7 +55700,7 @@ const manager = new THREE.LoadingManager();
 const gltfLoader = new THREE.GLTFLoader(manager);
 gltfLoader.setCrossOrigin('anonymous');
 gltfLoader.setDRACOLoader( new THREE.DRACOLoader() );
-const b3dmLoader = new THREE.B3DMLoader.B3DMLoader(manager, gltfLoader);
+const b3dmLoader = new THREE.B3DMLoader(manager, gltfLoader);
 
 // b3dmLoader.load(testUrl, (gltf) => {
 //
@@ -55830,6 +55907,8 @@ chrome.devtools.network.onRequestFinished.addListener(request => {
 
 // Clear the record if the page is refreshed or the user navigates to another page.
 chrome.devtools.network.onNavigated.addListener(() => contentTypes = {});
+
+
 
 
 

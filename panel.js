@@ -1,11 +1,13 @@
 window.THREE = require("three")
 
 var GLTFLoader = require("three/examples/js/loaders/GLTFLoader.js")
-window.THREE.B3DMLoader = require("three/examples/js/loaders/B3DMLoader.js")
+require("three/examples/js/loaders/B3DMLoader.js")
 require("three/examples/js/loaders/DRACOLoader.js")
 require('three/examples/js/controls/OrbitControls');
 require('three/examples/js/controls/TrackballControls');
 require('three/examples/js/controls/FirstPersonControls');
+
+
 
 //
 canvas = document.getElementById("canvas-webgl")
@@ -57,7 +59,7 @@ const manager = new THREE.LoadingManager();
 const gltfLoader = new THREE.GLTFLoader(manager);
 gltfLoader.setCrossOrigin('anonymous');
 gltfLoader.setDRACOLoader( new THREE.DRACOLoader() );
-const b3dmLoader = new THREE.B3DMLoader.B3DMLoader(manager, gltfLoader);
+const b3dmLoader = new THREE.B3DMLoader(manager, gltfLoader);
 
 // b3dmLoader.load(testUrl, (gltf) => {
 //
@@ -264,6 +266,8 @@ chrome.devtools.network.onRequestFinished.addListener(request => {
 
 // Clear the record if the page is refreshed or the user navigates to another page.
 chrome.devtools.network.onNavigated.addListener(() => contentTypes = {});
+
+
 
 
 
